@@ -29,9 +29,16 @@ public class Commodity {
         this.inStock += amount;
     }
 
+    public Commodity(String id){
+        this.id = id;
+    }
     public void addRate(String username, int score) {
         userRate.put(username, score);
         this.calcRating();
+    }
+
+    public String getId() {
+        return id;
     }
 
     private void calcRating() {
