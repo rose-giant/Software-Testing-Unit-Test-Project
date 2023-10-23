@@ -3,9 +3,7 @@ import exceptions.InsufficientCredit;
 import exceptions.InvalidCreditRange;
 import model.Commodity;
 import model.User;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
     private static User user;
-    @BeforeAll
-    static void Setup(){
+    @BeforeEach
+    void Setup(){
         user = new User("TestUsername", "TestPassword",
                 "testEmail", "TestBirthDate", "TestAddress");
     }
@@ -149,8 +147,8 @@ class UserTest {
         });
     }
 
-    @AfterAll
-    static void Teardown(){
+    @AfterEach
+    void Teardown(){
         user = null;
     }
 }
