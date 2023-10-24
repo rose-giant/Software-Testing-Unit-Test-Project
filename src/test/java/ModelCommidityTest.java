@@ -3,9 +3,12 @@ import io.micrometer.core.instrument.config.validate.Validated;
 import lombok.SneakyThrows;
 import model.Comment;
 import model.Commodity;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ModelCommodityTest {
 
-    Commodity commodity = new Commodity();
+    Commodity commodity = new Commodity("");
     String mockId = "mockId";
     String mockName = "mockName";
     String mockProviderId = "mockProviderId";
@@ -43,10 +46,9 @@ class ModelCommodityTest {
         this.commodity.setInitRate(this.mockInitRate);
     }
 
-    @Test
-    void updateInStockWithInStock0AmountMinus1ThrowsNotInStockException() {
-
-        int testedAmount = -1;
+    @ParameterizedTest
+    @ValueSource( ints = {-1, -2000})
+    void updateInStockWithInStock0AndMinusAmountThrowsNotInStockException(int testedAmount) {
         Exception exception = assertThrows(Exception.class, () -> {
             this.commodity.updateInStock(testedAmount);
         });
@@ -57,31 +59,10 @@ class ModelCommodityTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
-    @Test
-    void updateInStockWithInStock100AmountMinus2000ThrowsNotInStockException() {
 
-        int testedAmount = -2000;
-        this.commodity.setInStock(100);
-        Exception exception = assertThrows(Exception.class, () -> {
-            this.commodity.updateInStock(testedAmount);
-        });
-
-        String expectedMessage = "Commodity is not in stock.";
-        String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    void updateInStockWithInStock0Amount0ThrowsNotInStockException() {
-        int testedAmount = 0;
-        assertDoesNotThrow(() -> {
-            this.commodity.updateInStock(testedAmount);
-        });
-    }
-
-    @Test
-    void updateInStockWithInStock0Amount1ThrowsNotInStockException() {
-        int testedAmount = 1;
+    @ParameterizedTest
+    @ValueSource( ints = {0, 1})
+    void  updateInStockWithInStock0AndNotMinusAmountDoesNotThrowsNotInStockException(int testedAmount) {
         assertDoesNotThrow(() -> {
             this.commodity.updateInStock(testedAmount);
         });
@@ -175,5 +156,10 @@ class ModelCommodityTest {
         this.commodity.addRate("mockName", 353);
         this.commodity.addRate("mockName2", 3150);
         assertEquals(1174.6666259765625, this.commodity.getRating());
+    }
+
+    @AfterEach
+    void Teardown(){
+        this.commodity = null;
     }
 }
