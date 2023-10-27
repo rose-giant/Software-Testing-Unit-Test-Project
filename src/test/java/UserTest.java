@@ -23,7 +23,7 @@ class UserTest {
     @ParameterizedTest
     @ValueSource(floats = {-1, -10.4f, -1000.34f, -55555})
     public void ThrownInvalidCreditRangeExceptionWhenCreditIsNegative(float negVal) {
-        Exception exception = assertThrows(InvalidCreditRange.class, () -> {
+        assertThrows(InvalidCreditRange.class, () -> {
             user.addCredit(negVal);
         });
     }

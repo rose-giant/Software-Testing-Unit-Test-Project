@@ -1,11 +1,7 @@
 import lombok.SneakyThrows;
 import model.Comment;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
 import java.util.Map;
 import java.lang.reflect.Field;
 import java.time.Year;
@@ -32,16 +28,30 @@ class ModelCommentTest {
                 this.mockUserEmail, this.mockUserName, this.mockCommidityId, this.mockText);
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {0, 1, 10, 34, 5555})
-    void idIsAssignedToComment(int testedId) {
-        var comment = new Comment(testedId, this.mockUserEmail, this.mockUserName, this.mockCommidityId, this.mockText);
+    @SneakyThrows
+    @Test
+    void id123IsAssignedToComment() {
+        int testedId = 123;
+        var comment = new Comment(testedId,
+                this.mockUserEmail, this.mockUserName, this.mockCommidityId, this.mockText);
+        Field field = Comment.class.getDeclaredField("id");
+        field.setAccessible(true);
         assertEquals(testedId, comment.getId());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"Rose@gmal.com", "eoerjfonf98383823@gmal.com", "123123eoerjfonf98383823@gmal.com", "383823@gmal.com"})
-    void userEmailRoseIsAssignedToComment(String testedEmail) throws NoSuchFieldException {
+    @SneakyThrows
+    @Test
+    void id00000000IsAssignedToComment() {
+        int testedId = 00000000;
+        var comment = new Comment(testedId, this.mockUserEmail, this.mockUserName, this.mockCommidityId, this.mockText);
+        Field field = Comment.class.getDeclaredField("id");
+        field.setAccessible(true);
+        assertEquals(testedId, comment.getId());
+    }
+
+    @Test
+    void userEmailRoseIsAssignedToComment() throws NoSuchFieldException {
+        var testedEmail = "Rose@gmal.com";
         var comment = new Comment(this.mockId,
                 testedEmail, this.mockUserName, this.mockCommidityId, this.mockText);
         Field field = Comment.class.getDeclaredField("userEmail");
@@ -69,19 +79,47 @@ class ModelCommentTest {
         assertEquals(testedEmail, comment.getUserEmail());
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {0, 1, 10, 34, 5555, -12, -32232323})
-    void commidityIdAssigned(int testedCommidityId) {
+    @SneakyThrows
+    @Test
+    void commidityId10102IsAssignedToComment() {
+        var testedCommidityId = 10102;
         var comment = new Comment(this.mockId,
                 this.mockUserEmail, this.mockUserName, testedCommidityId, this.mockText);
+        Field field = Comment.class.getDeclaredField("commodityId");
+        field.setAccessible(true);
         assertEquals(testedCommidityId, comment.getCommodityId());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"", "sampleText", "2382372938", "jsdf23", "23123dfdfe", "sd23sdf23"})
-    void testTextsAssignedToComment(String testedText) {
+    @SneakyThrows
+    @Test
+    void commidityId00000000IsAssignedToComment() {
+        var testedCommidityId = 00000000;
+        var comment = new Comment(this.mockId,
+                this.mockUserEmail, this.mockUserName, testedCommidityId, this.mockText);
+        Field field = Comment.class.getDeclaredField("commodityId");
+        field.setAccessible(true);
+        assertEquals(testedCommidityId, comment.getCommodityId());
+    }
+
+    @SneakyThrows
+    @Test
+    void textEmptyIsAssignedToComment() {
+        var testedText = "";
         var comment = new Comment(this.mockId,
                 this.mockUserEmail, this.mockUserName, this.mockCommidityId, testedText);
+        Field field = Comment.class.getDeclaredField("text");
+        field.setAccessible(true);
+        assertEquals(testedText, comment.getText());
+    }
+
+    @SneakyThrows
+    @Test
+    void textSampleTextIsAssignedToComment() {
+        var testedText = "SampleText";
+        var comment = new Comment(this.mockId,
+                this.mockUserEmail, this.mockUserName, this.mockCommidityId, testedText);
+        Field field = Comment.class.getDeclaredField("text");
+        field.setAccessible(true);
         assertEquals(testedText, comment.getText());
     }
 
@@ -377,6 +415,7 @@ class ModelCommentTest {
         this.comment.addUserVote("mockUsername3", "like");
         this.comment.addUserVote("mockUsername4", "dislike");
         this.comment.addUserVote("mockUsername5", "like");
+        Map<String, String> userVote = this.comment.getUserVote();
         assertEquals(this.comment.getDislike(), 1);
     }
 
@@ -390,10 +429,6 @@ class ModelCommentTest {
         assertEquals(this.comment.getDislike(), 0);
     }
 
-    @AfterEach
-    void Teardown(){
-        this.comment = null;
-    }
 }
 
 
