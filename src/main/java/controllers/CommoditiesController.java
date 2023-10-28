@@ -72,7 +72,6 @@ public class CommoditiesController {
     @GetMapping(value = "/commodities/{id}/comment")
     public ResponseEntity<ArrayList<Comment>> getCommodityComment(@PathVariable String id) {
         ArrayList<Comment> comments = baloot.getCommentsForCommodity(Integer.parseInt(id));
-
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
