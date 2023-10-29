@@ -1,19 +1,18 @@
 package ControllerTest;
 
-import controllers.CommentController;
 import controllers.CommoditiesController;
-import exceptions.NotExistentComment;
 import exceptions.NotExistentCommodity;
+import exceptions.NotExistentUser;
+import model.Comment;
 import model.Commodity;
+import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.Null;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import service.Baloot;
 
@@ -25,13 +24,26 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 public class CommodityControllerTest {
-
     public CommoditiesController commoditiesController = new CommoditiesController();
     public Commodity mockCommodity = new Commodity();
+    public Comment mockComment = new Comment();
     public ArrayList<Commodity> mockCommodityList = new ArrayList<Commodity>();
     public Baloot mockBaloot;
-    public HttpStatus mockOKHttpStatus = HttpStatus.valueOf(200);
     public Map<String, String> rateInputMap = new HashMap<>();
+    public Map<String, String> userCommont = new HashMap<>();
+    public Map<String, String> searchCommodityMap = new HashMap<>();
+    public ArrayList<Comment> mockCommentList = new ArrayList<>();
+    ArrayList<Commodity> mockSuggestedCommodities = new ArrayList<>();
+
+    //String username, String password, String email, String birthDate, String address
+    public String mockUsername = "mockUsername";
+    public String mockPassword = "mockPassword";
+    public String mockEmail = "mockEmail";
+    public String mockBirthDate = "mockBirthDate";
+    public String mockAddress = "mockAddress";
+    public User mockUser = new User(mockUsername, mockPassword, mockEmail, mockBirthDate, mockAddress);
+
+    public ArrayList<Commodity> searchResultCommodities = new ArrayList<>();
 
     @BeforeEach
     public void setup() {
@@ -105,5 +117,153 @@ public class CommodityControllerTest {
 
         assertEquals(new ResponseEntity<>("Commodity not found!", HttpStatus.NOT_FOUND) , expectedResponse);
    }
+
+   @ParameterizedTest
+   @ValueSource(strings = {"111", "123"})
+    public void addCommodityCommentAddsMockCommentByMockUser(String mockId) throws NotExistentUser {
+        when(mockBaloot.generateCommentId()).thenReturn(Integer.parseInt(mockId));
+        when(mockBaloot.getUserById(mockUsername)).thenReturn(mockUser);
+
+        userCommont.put("username", mockUsername);
+        userCommont.put("comment", "mock comment text");
+        assertEquals(new ResponseEntity<>("comment added successfully!", HttpStatus.OK) ,
+                commoditiesController.addCommodityComment(mockId , userCommont));
+   }
+
+   //even when comment is null it is posted
+    @ParameterizedTest
+    @ValueSource(strings = {"111", "123"})
+        public void addCommodityCommentAddsCommodityCommentWithNullComment(String mockId) throws NotExistentUser {
+        when(mockBaloot.generateCommentId()).thenReturn(Integer.parseInt(mockId));
+        when(mockBaloot.getUserById(mockUsername)).thenReturn(mockUser);
+
+        userCommont.put("username", mockUsername);
+        assertEquals(new ResponseEntity<>("comment added successfully!", HttpStatus.OK) ,
+                commoditiesController.addCommodityComment(mockId , userCommont));
+    }
+
+    //the none existent user exception is not caught, instead the error occurs
+    @ParameterizedTest
+    @ValueSource(strings = {"111", "123"})
+    public void addCommodityCommentAddsCommodityCommentWithNullUser(String mockId) throws NotExistentUser {
+        when(mockBaloot.generateCommentId()).thenReturn(Integer.parseInt(mockId));
+        when(mockBaloot.getUserById(mockUsername)).thenReturn(null);
+
+        userCommont.put("username", mockUsername);
+        assertEquals(new ResponseEntity<>("comment added successfully!", HttpStatus.OK) ,
+                commoditiesController.addCommodityComment(mockId , userCommont));
+    }
+
+    @Test
+    public void getCommodityCommentReturnsMockCommentList() {
+        mockCommentList.add(mockComment);
+        when(mockBaloot.getCommentsForCommodity(11)).thenReturn(mockCommentList);
+        assertEquals(new ResponseEntity<>(mockCommentList, HttpStatus.OK) ,
+                commoditiesController.getCommodityComment("11"));
+    }
+
+    @Test
+    public void getCommodityCommentReturnsNullCommentList() {
+        when(mockBaloot.getCommentsForCommodity(11)).thenReturn(mockCommentList);
+        assertEquals(new ResponseEntity<>(mockCommentList, HttpStatus.OK) ,
+                commoditiesController.getCommodityComment("11"));
+    }
+
+    @Test
+    public void searchCommoditiesReturnsEmptyListForEmptySearchOfName() {
+        searchCommodityMap.put("searchOption", "name");
+        when(mockBaloot.filterCommoditiesByName("")).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK)
+        , commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @Test
+    public void searchCommoditiesReturnsEmptyListForEmptySearchOfCategory() {
+        searchCommodityMap.put("searchOption", "category");
+        when(mockBaloot.filterCommoditiesByName("")).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK)
+                , commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @Test
+    public void searchCommoditiesReturnsEmptyListForEmptySearchOfProvider() {
+        searchCommodityMap.put("searchOption", "provider");
+        when(mockBaloot.filterCommoditiesByName("")).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK)
+                , commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @Test
+    public void searchCommoditiesReturnsEmptyListForDummySearchOptionAsDefault() {
+        searchCommodityMap.put("searchOption", "dummyOption");
+        when(mockBaloot.filterCommoditiesByName("")).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK)
+                , commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ramen", "tteoknoki", "mochi", ""})
+    public void searchCommoditiesReturnsMockResultAsNameFilterSearchResult(String searchedName) {
+        searchCommodityMap.put("searchOption", "name");
+        searchCommodityMap.put("searchValue", searchedName);
+        when(mockBaloot.filterCommoditiesByName(searchedName)).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK) ,
+                commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ramen", "tteoknoki", "mochi", ""})
+    public void searchCommoditiesReturnsMockResultAsCategorySearchResult(String searchedCategory) {
+        searchCommodityMap.put("searchOption", "category");
+        searchCommodityMap.put("searchValue", searchedCategory);
+        when(mockBaloot.filterCommoditiesByCategory(searchedCategory)).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK) ,
+                commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ramen", "tteoknoki", "mochi", ""})
+    public void searchCommoditiesReturnsMockResultAsProviderSearchResult(String searchedProvider) {
+        searchCommodityMap.put("searchOption", "provider");
+        searchCommodityMap.put("searchValue", searchedProvider);
+        when(mockBaloot.filterCommoditiesByProviderName(searchedProvider)).thenReturn(searchResultCommodities);
+        assertEquals(new ResponseEntity<>(searchResultCommodities, HttpStatus.OK) ,
+                commoditiesController.searchCommodities(searchCommodityMap));
+    }
+
+    @Test
+    public void getSuggestedCommoditiesReturnsMockSuggestedCommoditiesWithMockCommodity() throws NotExistentCommodity {
+        when(mockBaloot.getCommodityById("0")).thenReturn(mockCommodity);
+        when(mockBaloot.suggestSimilarCommodities(mockCommodity)).thenReturn(mockSuggestedCommodities);
+        assertEquals(new ResponseEntity<>(mockSuggestedCommodities, HttpStatus.OK) ,
+                commoditiesController.getSuggestedCommodities("0"));
+    }
+
+    @Test
+    public void getSuggestedCommoditiesThrowsNotExistentCommodityExceptionWithNullCommodity() throws NotExistentCommodity {
+        when(mockBaloot.getCommodityById("0")).thenReturn(null);
+        when(mockBaloot.suggestSimilarCommodities(mockCommodity)).thenReturn(mockSuggestedCommodities);
+        assertEquals(new ResponseEntity<>(new ArrayList<>(), HttpStatus.NOT_FOUND) ,
+                commoditiesController.getSuggestedCommodities("022"));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
