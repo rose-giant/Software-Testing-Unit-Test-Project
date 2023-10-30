@@ -39,6 +39,7 @@ public class CommodityControllerTest {
     public ArrayList<Commodity> mockCommodityList = new ArrayList<Commodity>();
     public ArrayList<Commodity> searchResultCommodities = new ArrayList<>();
 
+
     public String mockUsername = "mockUsername";
     public String mockPassword = "mockPassword";
     public String mockEmail = "mockEmail";
