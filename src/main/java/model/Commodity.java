@@ -2,12 +2,14 @@ package model;
 
 import exceptions.NotInStock;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@NoArgsConstructor
 @Getter
 @Setter
 public class Commodity {
@@ -29,6 +31,9 @@ public class Commodity {
         this.inStock += amount;
     }
 
+    public Commodity(String id){
+        this.id = id;
+    }
     public void addRate(String username, int score) {
         userRate.put(username, score);
         this.calcRating();

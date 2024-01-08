@@ -31,6 +31,7 @@ public class User {
         this.email = email;
         this.birthDate = birthDate;
         this.address = address;
+        this.credit = 0;
     }
 
     public void addCredit(float amount) throws InvalidCreditRange {
@@ -75,5 +76,4 @@ public class User {
         } else
             throw new CommodityIsNotInBuyList();
     }
-
 }

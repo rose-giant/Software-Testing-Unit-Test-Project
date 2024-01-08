@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Comment {
+public class  Comment {
 
     int id;
     private String userEmail;

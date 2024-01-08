@@ -1,5 +1,6 @@
 package controllers;
 
+import org.junit.runner.RunWith;
 import service.Baloot;
 import model.User;
 import exceptions.InvalidCreditRange;
@@ -10,12 +11,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@RestController
 public class UserController {
-    @GetMapping(value = "/users/{id}")
+    private Baloot baloot = Baloot.getInstance();
+
+    public void setBaloot(Baloot baloot) {
+        this.baloot = baloot;
+    }
+    @RequestMapping(value = "/users/{id}",method = RequestMethod.GET)
     public ResponseEntity<User> getUser(@PathVariable String id) {
         try {
-            User user = Baloot.getInstance().getUserById(id);
+            User user = baloot.getUserById(id);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (NotExistentUser e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -26,7 +31,7 @@ public class UserController {
     public ResponseEntity<String> addCredit(@PathVariable String id, @RequestBody Map<String, String> input) {
         try {
             float credit = Float.parseFloat(input.get("credit"));
-            Baloot.getInstance().getUserById(id).addCredit(credit);
+            baloot.getUserById(id).addCredit(credit);
             return new ResponseEntity<>("credit added successfully!", HttpStatus.OK);
         } catch (InvalidCreditRange e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
