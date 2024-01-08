@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+Test set: ApiTest.UserControllerApiTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 0.49 s <<< FAILURE! - in ApiTest.UserControllerApiTest
+InvalidCreditRangeWhenCreditIsNotInRange{String}[1]  Time elapsed: 0.095 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<400> but was:<404>
+	at ApiTest.UserControllerApiTest.InvalidCreditRangeWhenCreditIsNotInRange(UserControllerApiTest.java:93)
+
+NumberFormatExceptionWhenCreditIsNotValid{String}[1]  Time elapsed: 0.105 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<400> but was:<404>
+	at ApiTest.UserControllerApiTest.NumberFormatExceptionWhenCreditIsNotValid(UserControllerApiTest.java:107)
+
+CreditAddedSuccessfullyWhenCreditIsValid{String}[1]  Time elapsed: 0.107 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+	at ApiTest.UserControllerApiTest.CreditAddedSuccessfullyWhenCreditIsValid(UserControllerApiTest.java:86)
+
+ReturnsMockUserWhenUsernameIsValid{String}[1]  Time elapsed: 0.181 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+	at ApiTest.UserControllerApiTest.ReturnsMockUserWhenUsernameIsValid(UserControllerApiTest.java:72)
+
